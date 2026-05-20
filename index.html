@@ -18,13 +18,28 @@
         <h2>Corrida das Biomoléculas</h2>
         <p class="subtitle">Encontre a molécula e sua função bioquímica antes do seu oponente!</p>
         
+        <div class="rules-container">
+          <div class="rule-section">
+            <h4>Objetivo</h4>
+            <p>Associe corretamente a molécula à sua função bioquímica e seja o primeiro a encontrar os 6 pares.</p>
+          </div>
+          <div class="rule-section">
+            <h4>Regras do Jogo</h4>
+            <ul>
+              <li><strong>Turnos:</strong> Os jogadores se revezam em turnos no mesmo tabuleiro.</li>
+              <li><strong>Acerto:</strong> Se encontrar um par, você ganha o ponto e joga novamente!</li>
+              <li><strong>Erro:</strong> Se errar, as cartas desviram e a vez passa para o adversário.</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="players-input">
           <div class="player-input-group p1">
-            <label for="p1-name">Jogador 1 (Esquerda)</label>
+            <label for="p1-name">Jogador 1</label>
             <input type="text" id="p1-name" placeholder="Nome J1" autocomplete="off">
           </div>
           <div class="player-input-group p2">
-            <label for="p2-name">Jogador 2 (Direita)</label>
+            <label for="p2-name">Jogador 2</label>
             <input type="text" id="p2-name" placeholder="Nome J2" autocomplete="off">
           </div>
         </div>
@@ -33,27 +48,23 @@
       </div>
     </div>
 
-    <!-- Fase 2: Jogo (Split-Screen) -->
+    <!-- Fase 2: Jogo (Turnos) -->
     <div id="game-screen" class="screen">
-      <!-- Lado Esquerdo -->
-      <div id="board-p1" class="board board-left">
-        <div class="board-header">
-          <h3 id="p1-display-name">Jogador 1</h3>
-          <div class="score" id="p1-score">0</div>
+      <div id="main-board" class="board">
+        <!-- Placar Unificado -->
+        <div class="scoreboard-header">
+          <div id="p1-panel" class="player-panel p1">
+            <h3 id="p1-display-name">Jogador 1</h3>
+            <div class="score" id="p1-score">0</div>
+          </div>
+          
+          <div id="p2-panel" class="player-panel p2">
+            <h3 id="p2-display-name">Jogador 2</h3>
+            <div class="score" id="p2-score">0</div>
+          </div>
         </div>
-        <div class="grid" id="grid-p1"></div>
-      </div>
-
-      <!-- Divisória -->
-      <div class="divider"></div>
-
-      <!-- Lado Direito -->
-      <div id="board-p2" class="board board-right">
-        <div class="board-header">
-          <h3 id="p2-display-name">Jogador 2</h3>
-          <div class="score" id="p2-score">0</div>
-        </div>
-        <div class="grid" id="grid-p2"></div>
+        
+        <div class="grid" id="main-grid"></div>
       </div>
     </div>
 

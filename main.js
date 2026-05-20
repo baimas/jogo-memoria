@@ -46,22 +46,12 @@ const BIOMOLECULES = [
 
 // Estado da Aplicação
 const state = {
-  p1: {
-    name: '',
-    score: 0,
-    flippedCards: [],
-    matchedPairs: 0,
-    isFrozen: false,
-    boardId: 'p1'
-  },
-  p2: {
-    name: '',
-    score: 0,
-    flippedCards: [],
-    matchedPairs: 0,
-    isFrozen: false,
-    boardId: 'p2'
-  },
+  p1: { name: '', score: 0, panelId: 'p1-panel' },
+  p2: { name: '', score: 0, panelId: 'p2-panel' },
+  currentPlayer: 'p1', // 'p1' ou 'p2'
+  flippedCards: [],
+  matchedPairsTotal: 0,
+  isFrozen: false,
   gameActive: false,
   winScore: 6
 };
@@ -84,17 +74,15 @@ const displays = {
   p1Name: document.getElementById('p1-display-name'),
   p2Name: document.getElementById('p2-display-name'),
   p1Score: document.getElementById('p1-score'),
-  p2Score: document.getElementById('p2-score')
+  p2Score: document.getElementById('p2-score'),
+  p1Panel: document.getElementById('p1-panel'),
+  p2Panel: document.getElementById('p2-panel')
 };
 
-const grids = {
-  p1: document.getElementById('grid-p1'),
-  p2: document.getElementById('grid-p2')
-};
+const grid = document.getElementById('main-grid');
 
 // Inicialização
 function init() {
-  // Listeners de Input
   inputs.p1.addEventListener('input', checkInputs);
   inputs.p2.addEventListener('input', checkInputs);
   
@@ -118,19 +106,17 @@ function startGame() {
   switchScreen('game');
   state.gameActive = true;
   
-  setupBoard('p1');
-  setupBoard('p2');
+  setupBoard();
+  updateTurnUI();
 }
 
 function resetGame() {
   state.p1.score = 0;
   state.p2.score = 0;
-  state.p1.matchedPairs = 0;
-  state.p2.matchedPairs = 0;
-  state.p1.flippedCards = [];
-  state.p2.flippedCards = [];
-  state.p1.isFrozen = false;
-  state.p2.isFrozen = false;
+  state.currentPlayer = 'p1';
+  state.matchedPairsTotal = 0;
+  state.flippedCards = [];
+  state.isFrozen = false;
   state.gameActive = false;
   
   updateScore('p1');
@@ -147,11 +133,21 @@ function switchScreen(screenName) {
   screens[screenName].classList.add('active');
 }
 
+function updateTurnUI() {
+  displays.p1Panel.classList.remove('active');
+  displays.p2Panel.classList.remove('active');
+  
+  if (state.currentPlayer === 'p1') {
+    displays.p1Panel.classList.add('active');
+  } else {
+    displays.p2Panel.classList.add('active');
+  }
+}
+
 // Lógica do Tabuleiro
 function generateCardsArray() {
   const cards = [];
   BIOMOLECULES.forEach(mol => {
-    // Carta A (Nome)
     cards.push({
       pairId: mol.id,
       text: mol.cardA,
@@ -159,7 +155,6 @@ function generateCardsArray() {
       tagClass: mol.tagClass,
       uid: Math.random().toString(36).substr(2, 9)
     });
-    // Carta B (Função)
     cards.push({
       pairId: mol.id,
       text: mol.cardB,
@@ -169,7 +164,6 @@ function generateCardsArray() {
     });
   });
   
-  // Shuffle (Fisher-Yates)
   for (let i = cards.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [cards[i], cards[j]] = [cards[j], cards[i]];
@@ -177,8 +171,7 @@ function generateCardsArray() {
   return cards;
 }
 
-function setupBoard(playerKey) {
-  const grid = grids[playerKey];
+function setupBoard() {
   grid.innerHTML = '';
   
   const cards = generateCardsArray();
@@ -199,35 +192,27 @@ function setupBoard(playerKey) {
       </div>
     `;
     
-    // Listener Isolado
-    cardEl.addEventListener('click', () => handleCardClick(playerKey, cardEl.querySelector('.card')));
+    cardEl.addEventListener('click', () => handleCardClick(cardEl.querySelector('.card')));
     grid.appendChild(cardEl);
   });
 }
 
-function handleCardClick(playerKey, cardEl) {
-  if (!state.gameActive) return;
-  
-  const playerState = state[playerKey];
-  
-  // Condições de bloqueio
-  if (playerState.isFrozen) return;
+function handleCardClick(cardEl) {
+  if (!state.gameActive || state.isFrozen) return;
   if (cardEl.classList.contains('is-flipped') || cardEl.classList.contains('is-matched')) return;
-  if (playerState.flippedCards.length >= 2) return; // Segurança extra
+  if (state.flippedCards.length >= 2) return;
   
-  // Virar a carta
   cardEl.classList.add('is-flipped');
-  playerState.flippedCards.push(cardEl);
+  state.flippedCards.push(cardEl);
   
-  // Checar Match
-  if (playerState.flippedCards.length === 2) {
-    checkMatch(playerKey);
+  if (state.flippedCards.length === 2) {
+    checkMatch();
   }
 }
 
-function checkMatch(playerKey) {
-  const playerState = state[playerKey];
-  const [card1, card2] = playerState.flippedCards;
+function checkMatch() {
+  state.isFrozen = true;
+  const [card1, card2] = state.flippedCards;
   
   const id1 = card1.getAttribute('data-pair-id');
   const id2 = card2.getAttribute('data-pair-id');
@@ -240,21 +225,20 @@ function checkMatch(playerKey) {
     setTimeout(() => {
       card1.classList.add('is-matched');
       card2.classList.add('is-matched');
-      playerState.flippedCards = [];
+      state.flippedCards = [];
       
-      playerState.score++;
-      playerState.matchedPairs++;
-      updateScore(playerKey);
+      // Pontuar para o jogador atual
+      state[state.currentPlayer].score++;
+      state.matchedPairsTotal++;
+      updateScore(state.currentPlayer);
       
+      state.isFrozen = false;
       checkVictory();
-    }, 400); // tempo para ver a cor de sucesso
+      // O jogador continua jogando (não muda o turno)
+    }, 400);
 
   } else {
     // Erro (Mismatch)
-    playerState.isFrozen = true;
-    const boardEl = document.getElementById(`board-${playerKey}`);
-    boardEl.classList.add('frozen');
-    
     card1.classList.add('error');
     card2.classList.add('error');
     
@@ -262,10 +246,13 @@ function checkMatch(playerKey) {
       card1.classList.remove('is-flipped', 'error');
       card2.classList.remove('is-flipped', 'error');
       
-      playerState.flippedCards = [];
-      playerState.isFrozen = false;
-      boardEl.classList.remove('frozen');
-    }, 1200); // 1.2s de congelamento
+      state.flippedCards = [];
+      state.isFrozen = false;
+      
+      // Passar a vez
+      state.currentPlayer = state.currentPlayer === 'p1' ? 'p2' : 'p1';
+      updateTurnUI();
+    }, 1200);
   }
 }
 
@@ -273,7 +260,6 @@ function updateScore(playerKey) {
   const scoreEl = displays[`${playerKey}Score`];
   scoreEl.textContent = state[playerKey].score;
   
-  // Animar score
   scoreEl.classList.remove('pulse');
   void scoreEl.offsetWidth; // trigger reflow
   scoreEl.classList.add('pulse');
@@ -282,20 +268,33 @@ function updateScore(playerKey) {
 function checkVictory() {
   if (!state.gameActive) return;
   
-  let winner = null;
-  if (state.p1.matchedPairs === state.winScore) winner = state.p1;
-  else if (state.p2.matchedPairs === state.winScore) winner = state.p2;
-  
-  if (winner) {
+  if (state.matchedPairsTotal === state.winScore) {
     state.gameActive = false;
     
-    document.getElementById('winner-name').textContent = winner.name;
+    let winnerText = '';
+    if (state.p1.score > state.p2.score) {
+      winnerText = state.p1.name;
+    } else if (state.p2.score > state.p1.score) {
+      winnerText = state.p2.name;
+    } else {
+      winnerText = 'Empate!';
+    }
+    
+    document.getElementById('winner-name').textContent = winnerText;
+    
+    const h2Msg = document.querySelector('#victory-screen h2');
+    if (winnerText === 'Empate!') {
+      h2Msg.textContent = 'Foi um jogo disputado!';
+    } else {
+      h2Msg.textContent = 'venceu a corrida!';
+    }
+    
     document.getElementById('final-score-p1').textContent = `${state.p1.name}: ${state.p1.score} pontos`;
     document.getElementById('final-score-p2').textContent = `${state.p2.name}: ${state.p2.score} pontos`;
     
     setTimeout(() => {
       switchScreen('victory');
-    }, 600); // Esperar a animação da última carta desaparecer
+    }, 600);
   }
 }
 
