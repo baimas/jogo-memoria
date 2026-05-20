@@ -31,6 +31,9 @@
 body {
   background-color: var(--bg-color);
   overflow: hidden; /* Prevent scrolling, it's a single screen game */
+  touch-action: none; /* Previne zoom de duplo toque e refresh */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #app {
@@ -419,6 +422,10 @@ h3 {
   
   .board {
     height: 50%;
+  }
+
+  .board-left {
+    transform: rotate(180deg);
   }
 
   h3 { font-size: 1rem; }
