@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BioMemória: Corrida das Biomoléculas</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Fase 1: Tela Inicial -->
+    <div id="start-screen" class="screen active">
+      <div class="start-container">
+        <h1>BioMemória</h1>
+        <h2>Corrida das Biomoléculas</h2>
+        <p class="subtitle">Encontre a molécula e sua função bioquímica antes do seu oponente!</p>
+        
+        <div class="players-input">
+          <div class="player-input-group p1">
+            <label for="p1-name">Jogador 1 (Esquerda)</label>
+            <input type="text" id="p1-name" placeholder="Nome J1" autocomplete="off">
+          </div>
+          <div class="player-input-group p2">
+            <label for="p2-name">Jogador 2 (Direita)</label>
+            <input type="text" id="p2-name" placeholder="Nome J2" autocomplete="off">
+          </div>
+        </div>
+
+        <button id="btn-start" disabled>Iniciar Reação</button>
+      </div>
+    </div>
+
+    <!-- Fase 2: Jogo (Split-Screen) -->
+    <div id="game-screen" class="screen">
+      <!-- Lado Esquerdo -->
+      <div id="board-p1" class="board board-left">
+        <div class="board-header">
+          <h3 id="p1-display-name">Jogador 1</h3>
+          <div class="score" id="p1-score">0</div>
+        </div>
+        <div class="grid" id="grid-p1"></div>
+      </div>
+
+      <!-- Divisória -->
+      <div class="divider"></div>
+
+      <!-- Lado Direito -->
+      <div id="board-p2" class="board board-right">
+        <div class="board-header">
+          <h3 id="p2-display-name">Jogador 2</h3>
+          <div class="score" id="p2-score">0</div>
+        </div>
+        <div class="grid" id="grid-p2"></div>
+      </div>
+    </div>
+
+    <!-- Fase 3: Vitória -->
+    <div id="victory-screen" class="screen">
+      <div class="victory-container">
+        <div class="crown">👑</div>
+        <h1 id="winner-name">Vencedor</h1>
+        <h2>venceu a corrida!</h2>
+        <div class="final-scores">
+          <p id="final-score-p1"></p>
+          <p id="final-score-p2"></p>
+        </div>
+        <button id="btn-restart">Jogar Novamente</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
