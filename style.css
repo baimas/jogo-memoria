@@ -30,8 +30,8 @@
 
 body {
   background-color: var(--bg-color);
-  overflow: hidden; /* Prevent scrolling, it's a single screen game */
-  touch-action: none; /* Previne zoom de duplo toque e refresh */
+  overflow: auto; /* Permite rolagem caso o conteúdo no mobile fique muito extenso */
+  touch-action: manipulation; /* Permite rolagem vertical/horizontal mas previne zoom de duplo toque */
   user-select: none;
   -webkit-user-select: none;
 }
