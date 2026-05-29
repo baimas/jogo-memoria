@@ -222,37 +222,51 @@ function checkMatch() {
     card1.classList.add('success');
     card2.classList.add('success');
     
+    // Aguarda um clique ou toque para recolher as cartas e pontuar
     setTimeout(() => {
-      card1.classList.add('is-matched');
-      card2.classList.add('is-matched');
-      state.flippedCards = [];
+      const matchHandler = () => {
+        card1.classList.add('is-matched');
+        card2.classList.add('is-matched');
+        state.flippedCards = [];
+        
+        // Pontuar para o jogador atual
+        state[state.currentPlayer].score++;
+        state.matchedPairsTotal++;
+        updateScore(state.currentPlayer);
+        
+        state.isFrozen = false;
+        checkVictory();
+        // O jogador continua jogando (não muda o turno)
+        
+        document.removeEventListener('pointerdown', matchHandler);
+      };
       
-      // Pontuar para o jogador atual
-      state[state.currentPlayer].score++;
-      state.matchedPairsTotal++;
-      updateScore(state.currentPlayer);
-      
-      state.isFrozen = false;
-      checkVictory();
-      // O jogador continua jogando (não muda o turno)
-    }, 400);
+      document.addEventListener('pointerdown', matchHandler);
+    }, 50);
 
   } else {
     // Erro (Mismatch)
     card1.classList.add('error');
     card2.classList.add('error');
     
+    // Aguarda um clique ou toque em qualquer lugar para desvirar as cartas
     setTimeout(() => {
-      card1.classList.remove('is-flipped', 'error');
-      card2.classList.remove('is-flipped', 'error');
+      const unflipHandler = () => {
+        card1.classList.remove('is-flipped', 'error');
+        card2.classList.remove('is-flipped', 'error');
+        
+        state.flippedCards = [];
+        state.isFrozen = false;
+        
+        // Passar a vez
+        state.currentPlayer = state.currentPlayer === 'p1' ? 'p2' : 'p1';
+        updateTurnUI();
+        
+        document.removeEventListener('pointerdown', unflipHandler);
+      };
       
-      state.flippedCards = [];
-      state.isFrozen = false;
-      
-      // Passar a vez
-      state.currentPlayer = state.currentPlayer === 'p1' ? 'p2' : 'p1';
-      updateTurnUI();
-    }, 1200);
+      document.addEventListener('pointerdown', unflipHandler);
+    }, 50); // delay pequeno para não capturar o clique original que virou a carta
   }
 }
 

@@ -77,8 +77,8 @@ body {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  max-width: 90%;
-  width: 500px;
+  max-width: 95%;
+  width: 800px;
 }
 
 h1 {
@@ -88,6 +88,10 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
+  line-height: 1.4;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  margin-top: -15px;
 }
 
 h2 {
